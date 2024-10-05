@@ -67,10 +67,10 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          READ_TOKEN: ${{ secrets.READ_TOKEN }}
         run: |
           terraform apply -var "user_data_scripts=${{ env.SCRIPTS_LIST }}" \
-                          -var "github_token=${{ secrets.GITHUB_TOKEN }}" \
+                          -var "github_token=${{ secrets.READ_TOKEN }}" \
                           -auto-approve
 
       # Paso 9: Guardar Variables en el Repositorio
