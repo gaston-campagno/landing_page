@@ -22,15 +22,6 @@ jobs:
         with:
           repository: gaston-campagno/infra
           token: ${{ secrets.READ_TOKEN }}
-          path: infra-repo # Puedes darle un nombre temporal, como 'infra-repo'
-      
-      # Mover el contenido de la carpeta 'terraform-code' dentro del repo clonado
-      - name: Move Terraform folder
-        run: mv infra-repo/terraform-code/* terraform-code/
-        
-      # Listar los archivos movidos para verificar
-      - name: List moved Terraform files
-        run: ls -la terraform-code
 
       # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
@@ -38,7 +29,6 @@ jobs:
         with:
           repository: gaston-campagno/scripts
           token: ${{ secrets.READ_TOKEN }}
-          path: scripts-code
 
       # Paso 4: Setup Terraform
       - name: Setup Terraform
