@@ -16,18 +16,20 @@ jobs:
       - name: Checkout React Repo
         uses: actions/checkout@v3
 
-      # Paso 2: Checkout del repositorio de Terraform (infraestructura)
+      # Checkout del repositorio de Terraform
       - name: Checkout Terraform Repo
         uses: actions/checkout@v3
         with:
           repository: gaston-campagno/infra
-          token: ${{ secrets.READ_TOKEN }}
-          path: terraform-code
-          ref: main
-
-          # Paso 3: Verificar contenido del repositorio
-      - name: List Terraform Files
-        run: ls -al terraform-code
+          path: infra-repo # Puedes darle un nombre temporal, como 'infra-repo'
+      
+      # Mover el contenido de la carpeta 'terraform-code' dentro del repo clonado
+      - name: Move Terraform folder
+        run: mv infra-repo/terraform-code/* terraform-code/
+        
+      # Listar los archivos movidos para verificar
+      - name: List moved Terraform files
+        run: ls -la terraform-code
 
       # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
