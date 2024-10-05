@@ -21,14 +21,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: git@github.com:gaston-campagno/infra.git
-          path: ./
+          path: terraform-code
 
       # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
         uses: actions/checkout@v3
         with:
           repository: git@github.com:gaston-campagno/scripts.git
-          path: ./
+          path: scripts-code
 
       # Paso 4: Setup Terraform
       - name: Setup Terraform
@@ -41,39 +41,47 @@ jobs:
         working-directory: terraform-code
         run: terraform init
 
-      # Paso 6: Aplicar Terraform y capturar el output del SG ID
-      - name: Apply Terraform and Capture SG ID
+      # Paso 6: Aplicar Terraform y capturar el output del Security Group ID y de la IP pública de la instancia
+      - name: Apply Terraform and Capture Outputs
         working-directory: terraform-code
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           terraform apply -auto-approve
-          # Guardar el ID del Security Group en un archivo temporal para usarlo más tarde
+          # Guardar el ID del Security Group y la IP pública de la instancia en un archivo temporal para usarlo más tarde
           echo "SECURITY_GROUP_ID=$(terraform output -raw security_group_id)" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id)" >> $GITHUB_ENV
 
-      # Paso 7: Aplicar reglas del Security Group desde el repo de la aplicación
-      - name: Apply Security Group Rules
-        working-directory: .
+            # Leer la lista de scripts
+      - name: Read User Data Scripts
+        id: read_scripts
+        run: |
+          SCRIPTS_LIST=$(grep -oP 'default\s*=\s*\[\K[^\]]+' ../terraform/variables.tf | tr -d ' ')
+          echo "SCRIPTS_LIST=${SCRIPTS_LIST}" >> $GITHUB_ENV
+
+      # Aplicar Terraform pasando la lista de scripts y el token de GitHub desde los secretos
+      - name: Apply Terraform with Scripts and Token
+        working-directory: terraform-code
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SECURITY_GROUP_ID: ${{ env.SECURITY_GROUP_ID }}  # Usamos el output de Terraform aquí
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Si tus reglas del security group están en Terraform, también puedes ejecutar otro terraform apply aquí
-          cd path/to/your/app-repo/sg-rules
-          terraform init
-          terraform apply -var="security_group_id=$SECURITY_GROUP_ID" -auto-approve
-          # Paso 8: Guardar Variables en el Repositorio
-          
+          terraform apply -var "user_data_scripts=${{ env.SCRIPTS_LIST }}" \
+                          -var "github_token=${{ secrets.GITHUB_TOKEN }}" \
+                          -auto-approve
+
+      # Paso 9: Guardar Variables en el Repositorio
       - name: Guardar Variables en el Repositorio
         run: |
           # Guarda la IP pública de la instancia
           echo "Guardando EC2_INSTANCE_PUBLIC_IP en Variables del Repositorio"
           gh api -X PUT /repos/$GITHUB_REPOSITORY/actions/variables/EC2_INSTANCE_PUBLIC_IP \
-            -f value=$EC2_INSTANCE_PUBLIC_IP
+            -f value=${{ env.EC2_INSTANCE_PUBLIC_IP }}
 
           # Guarda el ID de la instancia
           echo "Guardando EC2_INSTANCE_ID en Variables del Repositorio"
           gh api -X PUT /repos/$GITHUB_REPOSITORY/actions/variables/EC2_INSTANCE_ID \
-            -f value=$EC2_INSTANCE_ID
+            -f value=${{ env.EC2_INSTANCE_ID }}
