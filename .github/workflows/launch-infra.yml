@@ -39,11 +39,9 @@ jobs:
       # Paso 5: Inicializar Terraform
       - name: Initialize Terraform
         working-directory: terraform-code
-        run: terraform init
 
       # Paso 6: Aplicar Terraform y capturar el output del Security Group ID y de la IP pública de la instancia
       - name: Apply Terraform and Capture Outputs
-        working-directory: terraform-code
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
