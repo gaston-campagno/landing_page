@@ -20,14 +20,16 @@ jobs:
       - name: Checkout Terraform Repo
         uses: actions/checkout@v3
         with:
-          repository: git@github.com:gaston-campagno/infra.git
+          repository: gaston-campagno/infra
+          token: ${{ secrets.READ_TOKEN }}
           path: terraform-code
 
       # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
         uses: actions/checkout@v3
         with:
-          repository: git@github.com:gaston-campagno/scripts.git
+          repository: gaston-campagno/scripts
+          token: ${{ secrets.READ_TOKEN }}
           path: scripts-code
 
       # Paso 4: Setup Terraform
