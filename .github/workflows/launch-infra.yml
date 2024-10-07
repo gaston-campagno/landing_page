@@ -18,6 +18,10 @@ jobs:
         with:
           path: react-repo
 
+      - name: PWD react-repo
+        run: |
+          pwd
+
         # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
         uses: actions/checkout@v3
@@ -37,7 +41,7 @@ jobs:
       # Paso 2: Mover variables.tf desde react-repo a terraform-repo
       - name: Move variables.tf
         run: |
-          cp react-repo/variables.tf terraform-repo/variables.tf
+          cp react-repo/landing-page/variables.tf terraform-repo/variables.tf
 
               # Mostrar el path actual
       - name: Mostrar path actual
