@@ -43,3 +43,8 @@ variable "github_token" {
   type    = string
   default = ""
 }
+
+variable "aws_region" {
+  type    = string
+  default = "us-east-2"
+}
