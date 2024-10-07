@@ -7,3 +7,28 @@ instance_name   = "MyEC2Instance_2"
 security_group_name = "MyEC2Instance_2"
 user_data_script = ["docker.sh"]
 ssh_key         = "my-ssh-key_1"
+
+# terraform.tfvars
+security_group_ingress_rules = [
+  {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # SSH
+  },
+  {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  # HTTP
+  }
+]
+
+security_group_egress_rules = [
+  {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]  # Egreso libre
+  }
+]
