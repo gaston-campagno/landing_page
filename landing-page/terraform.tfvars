@@ -6,3 +6,4 @@ ami_id          = "ami-0862be96e41dcbf74"
 instance_name   = "MyEC2Instance_2"
 security_group_name = "MyEC2Instance_2"
 user_data_script = ["docker.sh"]
+ssh_key         = "my-ssh-key_1"

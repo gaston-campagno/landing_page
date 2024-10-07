@@ -43,3 +43,8 @@ variable "github_token" {
   type    = string
   default = ""
 }
+
+variable "ssh_key" {
+  type    = string
+  default = "my-ssh-key_1"
+}
