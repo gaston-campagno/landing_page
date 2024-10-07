@@ -54,7 +54,7 @@ jobs:
       # Paso 5: Inicializar Terraform
       - name: Initialize Terraform
         run: |
-          cd infra
+          cd /home/runner/work/landing_page/landing_page
           terraform init
         
       # Paso 6: Aplicar Terraform y capturar el output del Security Group ID y de la IP pública de la instancia
