@@ -15,6 +15,8 @@ jobs:
       # Paso 1: Checkout del repositorio de React (la app)
       - name: Checkout React Repo
         uses: actions/checkout@v3
+        with:
+          path: react-repo
 
         # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
@@ -22,6 +24,7 @@ jobs:
         with:
           repository: gaston-campagno/scripts
           token: ${{ secrets.READ_TOKEN }}
+          path: scripts-repo
 
       # Checkout del repositorio de Terraform
       - name: Checkout Terraform Repo
@@ -29,6 +32,12 @@ jobs:
         with:
           repository: gaston-campagno/infra
           token: ${{ secrets.READ_TOKEN }}
+          path: terraform-repo
+
+      # Paso 2: Mover variables.tf desde react-repo a terraform-repo
+      - name: Move variables.tf
+        run: |
+          cp react-repo/variables.tf terraform-repo/variables.tf
 
               # Mostrar el path actual
       - name: Mostrar path actual
@@ -40,11 +49,6 @@ jobs:
         run: |
           ls -la
 
-      - name: Chage Directory
-        run: |
-          cd /home/runner/work/landing_page/landing_page
-          ls -a
-
       # Paso 4: Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -55,7 +59,7 @@ jobs:
       - name: Initialize Terraform
         run: |
           pwd
-          cd /home/runner/work/landing_page/landing_page
+          cd terraform-repo
           ls -a
           terraform init
         
@@ -75,7 +79,7 @@ jobs:
       - name: Read User Data Scripts
         id: read_scripts
         run: |
-          SCRIPTS_LIST=$(grep -oP 'default\s*=\s*\[\K[^\]]+' ../terraform/variables.tf | tr -d ' ')
+          SCRIPTS_LIST=$(grep -oP 'default\s*=\s*\[\K[^\]]+' ../react-repo/variables.tf | tr -d ' ')
           echo "SCRIPTS_LIST=${SCRIPTS_LIST}" >> $GITHUB_ENV
 
       # Aplicar Terraform pasando la lista de scripts y el token de GitHub desde los secretos
