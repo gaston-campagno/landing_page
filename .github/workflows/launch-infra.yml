@@ -35,7 +35,7 @@ jobs:
 
       - name: Chage Directory
         run: |
-          cd /home/runner/work/landing_page
+          cd /home/runner/work/landing_page/landing_page
           ls -a
 
       # Paso 3: Checkout del repositorio de Scripts de user_data
@@ -55,6 +55,7 @@ jobs:
       - name: Initialize Terraform
         run: |
           cd /home/runner/work/landing_page/landing_page
+          ls -a
           terraform init
         
       # Paso 6: Aplicar Terraform y capturar el output del Security Group ID y de la IP pública de la instancia
