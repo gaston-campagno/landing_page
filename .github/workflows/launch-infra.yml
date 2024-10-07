@@ -35,7 +35,7 @@ jobs:
 
       - name: Chage Directory
         run: |
-          cd /home/runner/work/landing_page/landing_page
+          cd /home/runner/work/landing_page
           ls -a
 
       # Paso 3: Checkout del repositorio de Scripts de user_data
