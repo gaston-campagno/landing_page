@@ -16,6 +16,13 @@ jobs:
       - name: Checkout React Repo
         uses: actions/checkout@v3
 
+        # Paso 3: Checkout del repositorio de Scripts de user_data
+      - name: Checkout User Data Scripts Repo
+        uses: actions/checkout@v3
+        with:
+          repository: gaston-campagno/scripts
+          token: ${{ secrets.READ_TOKEN }}
+
       # Checkout del repositorio de Terraform
       - name: Checkout Terraform Repo
         uses: actions/checkout@v3
@@ -32,13 +39,6 @@ jobs:
       - name: Listar archivos del repo clonado
         run: |
           ls -la
-
-      # Paso 3: Checkout del repositorio de Scripts de user_data
-      - name: Checkout User Data Scripts Repo
-        uses: actions/checkout@v3
-        with:
-          repository: gaston-campagno/scripts
-          token: ${{ secrets.READ_TOKEN }}
 
       - name: Chage Directory
         run: |
