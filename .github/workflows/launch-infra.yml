@@ -39,10 +39,12 @@ jobs:
           token: ${{ secrets.READ_TOKEN }}
           path: terraform-repo
 
-      # Paso 2: Mover variables.tf desde react-repo a terraform-repo
-      - name: Move variables.tf
+      # Paso 2: Mover variables.tf, terraform.tfvars y security_group_rules.tf desde react-repo a terraform-repo
+      - name: Move variables.tf, terraform.tfvars, and security_group_rules.tf
         run: |
           cp react-repo/landing-page/variables.tf terraform-repo/variables.tf
+          cp react-repo/landing-page/terraform.tfvars terraform-repo/terraform.tfvars
+          cp react-repo/landing-page/security_group_rules.tf terraform-repo/security_group_rules.tf
 
               # Mostrar el path actual
       - name: Mostrar path actual
