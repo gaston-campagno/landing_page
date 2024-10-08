@@ -9,6 +9,7 @@ user_data_script = ["docker.sh"]
 ssh_key         = "my-ssh-key_1"
 
 # terraform.tfvars
+# security rueles
 security_group_ingress_rules = [
   {
     from_port   = 22

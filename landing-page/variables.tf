@@ -49,6 +49,7 @@ variable "ssh_key" {
   default = "my-ssh-key_1"
 }
 
+# security rueles
 variable "security_group_ingress_rules" {
   description = "Lista de reglas de ingreso para el grupo de seguridad"
   type = list(object({
