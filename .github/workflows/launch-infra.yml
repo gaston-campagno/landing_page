@@ -84,8 +84,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           export TF_LOG=DEBUG
-          terraform apply -auto-approve
-
+          terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
+                          -auto-approve
+                                    
           echo "TF_LOG=DEBUG" >> $GITHUB_ENV
           # Capturar los outputs de Terraform
           SECURITY_GROUP_ID=$(terraform output -raw security_group_id)
@@ -102,24 +103,6 @@ jobs:
           echo "EC2_INSTANCE_PUBLIC_IP=$EC2_INSTANCE_PUBLIC_IP" >> $GITHUB_ENV
           echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> $GITHUB_ENV
 
-            # Leer la lista de scripts
-      - name: Read User Data Scripts
-        id: read_scripts
-        run: |
-          SCRIPTS_LIST=$(grep -oP 'default\s*=\s*\[\K[^\]]+' ../react-repo/variables.tf | tr -d ' ')
-          echo "SCRIPTS_LIST=${SCRIPTS_LIST}" >> $GITHUB_ENV
-
-      # Aplicar Terraform pasando la lista de scripts y el token de GitHub desde los secretos
-      - name: Apply Terraform with Scripts and Token
-        working-directory: terraform-code
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          READ_TOKEN: ${{ secrets.READ_TOKEN }}
-        run: |
-          terraform apply -var "user_data_scripts=${{ env.SCRIPTS_LIST }}" \
-                          -var "github_token=${{ secrets.READ_TOKEN }}" \
-                          -auto-approve
 
       # Paso 9: Guardar Variables en el Repositorio
       - name: Guardar Variables en el Repositorio
