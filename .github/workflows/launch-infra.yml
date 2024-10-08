@@ -48,10 +48,13 @@ jobs:
               # Mostrar el path actual
       - name: Mostrar path actual
         run: |
+          ls -a
           pwd
           cd ..
+          ls -a
           pwd
           cd ..
+          ls -a
           pwd
 
       # Listar archivos del repo clonado
