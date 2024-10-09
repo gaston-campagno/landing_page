@@ -25,3 +25,4 @@ jobs:
           ls -a
           echo  "${{ secrets.READ_TOKEN }}"
           echo ${{ github.repository }}
+          gh --version
