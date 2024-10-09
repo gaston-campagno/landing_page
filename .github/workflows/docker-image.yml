@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  
+  workflow_dispatch:
+  
+jobs:
+  launch_ec2:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Paso 1: Checkout del repositorio de React (la app)
+      - name: Checkout React Repo
+        uses: actions/checkout@v3
+        with:
+          path: react-repo
+
+      - name: Print Info
+        run: |
+          pwd
+          ls -a
+          echo  "${{ secrets.READ_TOKEN }}"
+          echo ${{ github.repository }}
