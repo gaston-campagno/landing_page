@@ -86,12 +86,16 @@ jobs:
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
                           -auto-approve
                                     
-          echo "TF_LOG=DEBUG" >> $GITHUB_ENV
-    
-          # Capturar los outputs de Terraform sin debug info
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | grep -o '^[^:]*')
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | grep -o '^[^:]*')
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | grep -o '^[^:]*')
+          # Capturar los outputs de Terraform sin mensajes adicionales
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id 2>/dev/null)
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null)
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id 2>/dev/null)
+      
+          # Validación para asegurarse de que las variables no están vacías
+          if [ -z "$SECURITY_GROUP_ID" ] || [ -z "$EC2_INSTANCE_PUBLIC_IP" ] || [ -z "$EC2_INSTANCE_ID" ]; then
+            echo "Error: no se pudieron capturar las variables de Terraform"
+            exit 1
+          fi
           
           
           # Imprimir los valores para verificar
@@ -100,6 +104,7 @@ jobs:
           echo "EC2 Instance ID: $EC2_INSTANCE_ID"
           
           
+          # Guardar en GITHUB_ENV
           # Guardar en GITHUB_ENV
           echo "SECURITY_GROUP_ID=$SECURITY_GROUP_ID" >> $GITHUB_ENV
           echo "EC2_INSTANCE_PUBLIC_IP=$EC2_INSTANCE_PUBLIC_IP" >> $GITHUB_ENV
