@@ -87,7 +87,7 @@ jobs:
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
                           -auto-approve
 
-          terraform apply > terraform_output.log 2>&1
+          terraform apply -auto-approve > terraform_output.log 2>&1
                                     
           echo "TF_LOG=DEBUG" >> $GITHUB_ENV
           # Capturar los outputs de Terraform
