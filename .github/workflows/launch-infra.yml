@@ -106,13 +106,10 @@ jobs:
           echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> $GITHUB_ENV
 
       - name: Guardar Variables en el Repositorio
+        working-directory: scripts-repo
+
         run: |
-          # Guarda la IP pública de la instancia
-          echo "Guardando EC2_INSTANCE_PUBLIC_IP en Variables del Repositorio"
-          gh api -X PUT /repos/${{ github.repository }}/actions/variables/EC2_INSTANCE_PUBLIC_IP \
-            -f value=${{ env.EC2_INSTANCE_PUBLIC_IP }}
-      
-          # Guarda el ID de la instancia
-          echo "Guardando EC2_INSTANCE_ID en Variables del Repositorio"
-          gh api -X PUT /repos/${{ github.repository }}/actions/variables/EC2_INSTANCE_ID \
-            -f value=${{ env.EC2_INSTANCE_ID }}
+          ./recordVar.sh "$GITHUB_REPOSITORY" "SECURITY_GROUP_ID" "$SECURITY_GROUP_ID" "${{ secrets.READ_TOKEN }}"
+          ./recordVar.sh "$GITHUB_REPOSITORY" "EC2_INSTANCE_PUBLIC_IP" "$EC2_INSTANCE_PUBLIC_IP" "${{ secrets.READ_TOKEN }}"
+          ./recordVar.sh "$GITHUB_REPOSITORY" "EC2_INSTANCE_ID" "$EC2_INSTANCE_ID" "${{ secrets.READ_TOKEN }}"
+          
