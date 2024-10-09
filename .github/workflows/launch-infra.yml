@@ -86,11 +86,11 @@ jobs:
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
                           -auto-approve
                                     
-          # Capturar los outputs de Terraform sin mensajes adicionales
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id 2>/dev/null)
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null)
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id 2>/dev/null)
-      
+          # Capturar los outputs de Terraform usando grep para evitar mensajes adicionales
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | grep -Eo 'sg-[0-9a-z]+')
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}')
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | grep -Eo 'i-[0-9a-z]+')
+          
           # Validación para asegurarse de que las variables no están vacías
           if [ -z "$SECURITY_GROUP_ID" ] || [ -z "$EC2_INSTANCE_PUBLIC_IP" ] || [ -z "$EC2_INSTANCE_ID" ]; then
             echo "Error: no se pudieron capturar las variables de Terraform"
