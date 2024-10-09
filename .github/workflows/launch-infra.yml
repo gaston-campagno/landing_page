@@ -87,10 +87,11 @@ jobs:
                           -auto-approve
                                     
           echo "TF_LOG=DEBUG" >> $GITHUB_ENV
-          # Capturar los outputs de Terraform
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id)
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip)
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id)
+    
+          # Capturar los outputs de Terraform sin debug info
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | grep -o '^[^:]*')
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | grep -o '^[^:]*')
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | grep -o '^[^:]*')
           
           
           # Imprimir los valores para verificar
