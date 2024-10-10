@@ -113,7 +113,7 @@ jobs:
         working-directory: scripts-repo
 
         run: |
-          GITHUB_REPOSITORY={{ github.repository }}
+          echo "github.repository: $GITHUB_REPOSITORY"
           echo "github.repository: $GITHUB_REPOSITORY"
           ./recordVar.sh "$GITHUB_REPOSITORY" "SECURITY_GROUP_ID" "$SECURITY_GROUP_ID" "${{ secrets.READ_TOKEN }}"
           ./recordVar.sh "$GITHUB_REPOSITORY" "EC2_INSTANCE_PUBLIC_IP" "$EC2_INSTANCE_PUBLIC_IP" "${{ secrets.READ_TOKEN }}"
