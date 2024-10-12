@@ -36,7 +36,7 @@ variable "security_group_name" {
 variable "user_data_script" {
   description = "User data script to be run on instance startup"
   type        = list(string)
-  default     = ["docker.sh"] # Nombre del script que estará en el repo de scripts
+  default     = ["docker.sh", "cerbot.sh"] # Nombre del script que estará en el repo de scripts
 }
 
 variable "github_token" {
