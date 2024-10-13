@@ -86,9 +86,10 @@ jobs:
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" -auto-approve
         
           # Capturar y filtrar los outputs de Terraform
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | grep -oE 'sg-[0-9a-z]+')
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}')
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | grep -oE 'i-[0-9a-z]+')
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id 2>/dev/null | grep -oE 'sg-[0-9a-z]+')
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}')
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id 2>/dev/null | grep -oE 'i-[0-9a-z]+')
+
 
           echo "Security Group ID FIRST: $SECURITY_GROUP_ID"
           echo "EC2 Public IP FIRST: $EC2_INSTANCE_PUBLIC_IP"
