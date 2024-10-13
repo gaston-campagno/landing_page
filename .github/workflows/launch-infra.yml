@@ -100,11 +100,6 @@ jobs:
             echo "Error: no se pudieron capturar las variables de Terraform"
             exit 1
           fi
-        
-          # Limpieza de valores
-#          SECURITY_GROUP_ID=$(echo "$SECURITY_GROUP_ID" | tr -d '[:space:]' | sed 's/\"//g')
-#          EC2_INSTANCE_PUBLIC_IP=$(echo "$EC2_INSTANCE_PUBLIC_IP" | tr -d '[:space:]' | sed 's/\"//g')
- #         EC2_INSTANCE_ID=$(echo "$EC2_INSTANCE_ID" | tr -d '[:space:]' | sed 's/\"//g')
 
           echo "Security Group ID SECOND: $SECURITY_GROUP_ID"
           echo "EC2 Public IP SECOND: $EC2_INSTANCE_PUBLIC_IP"
