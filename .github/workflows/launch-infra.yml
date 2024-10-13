@@ -86,10 +86,10 @@ jobs:
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
                           -auto-approve
         
-          # Capturar los outputs de Terraform y eliminar espacios adicionales
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | tr -d '[:space:]')
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | tr -d '[:space:]')
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | tr -d '[:space:]')
+          # Capturar los outputs de Terraform directamente sin prefijos o depuraciones adicionales
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id 2>/dev/null)
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null)
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id 2>/dev/null)
         
           # Validación para asegurarse de que las variables no están vacías
           if [ -z "$SECURITY_GROUP_ID" ] || [ -z "$EC2_INSTANCE_PUBLIC_IP" ] || [ -z "$EC2_INSTANCE_ID" ]; then
@@ -97,18 +97,16 @@ jobs:
             exit 1
           fi
         
-          # Guardar en GITHUB_ENV asegurando no agregar datos innecesarios o duplicados
-          echo "SECURITY_GROUP_ID=$(echo "$SECURITY_GROUP_ID" | tr -s ' ' | tr -d '[:space:]')" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_PUBLIC_IP=$(echo "$EC2_INSTANCE_PUBLIC_IP" | tr -s ' ' | tr -d '[:space:]')" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_ID=$(echo "$EC2_INSTANCE_ID" | tr -s ' ' | tr -d '[:space:]')" >> $GITHUB_ENV
+          # Guardar las variables en GITHUB_ENV sin duplicaciones ni datos extraños
+          echo "SECURITY_GROUP_ID=$SECURITY_GROUP_ID" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_PUBLIC_IP=$EC2_INSTANCE_PUBLIC_IP" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> $GITHUB_ENV
           
           # Imprimir los valores para verificar que estén correctos
           echo "Security Group ID: $SECURITY_GROUP_ID"
           echo "EC2 Public IP: $EC2_INSTANCE_PUBLIC_IP"
           echo "EC2 Instance ID: $EC2_INSTANCE_ID"
-
-          
-
+  
       - name: Guardar Variables en el Repositorio
         working-directory: scripts-repo
 
