@@ -84,11 +84,13 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" -auto-approve
-        
+          
+          export TF_LOG=ERROR
+          
           # Capturar y filtrar los outputs de Terraform
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id 2>/dev/null)
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null)
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id 2>/dev/null)
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id)
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip)
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id)
 
 
           echo "Security Group ID FIRST: $SECURITY_GROUP_ID"
