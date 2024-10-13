@@ -76,6 +76,10 @@ jobs:
           ls -a
           terraform init
         
+      - name: Set Terraform logging level
+        run: |
+          echo "TF_LOG=ERROR" >> $GITHUB_ENV
+
       # Paso 6: Aplicar Terraform y capturar el output del Security Group ID y de la IP pública de la instancia
       - name: Apply Terraform and Capture Outputs
         working-directory: terraform-repo
@@ -84,9 +88,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" -auto-approve
-          
-          export TF_LOG=ERROR
-          
+                    
           # Capturar y filtrar los outputs de Terraform
           SECURITY_GROUP_ID=$(terraform output -raw security_group_id)
           EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip)
