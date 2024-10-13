@@ -83,25 +83,24 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
-                          -auto-approve
-                                    
-           # Capturar los outputs de Terraform usando grep para evitar mensajes adicionales
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | tr -d '[:space:]')
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | tr -d '[:space:]')
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | tr -d '[:space:]')
+          terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" -auto-approve
           
+          # Redirigir cualquier mensaje de debug o error a stderr, dejando solo el output limpio
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id 2>/dev/null | tr -d '[:space:]')
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null | tr -d '[:space:]')
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id 2>/dev/null | tr -d '[:space:]')
+        
           # Validación para asegurarse de que las variables no están vacías
           if [ -z "$SECURITY_GROUP_ID" ] || [ -z "$EC2_INSTANCE_PUBLIC_IP" ] || [ -z "$EC2_INSTANCE_ID" ]; then
             echo "Error: no se pudieron capturar las variables de Terraform"
             exit 1
           fi
-
-          # Guardar las variables en GITHUB_ENV para hacerlas disponibles en pasos futuros
+        
+          # Guardar las variables en GITHUB_ENV
           echo "SECURITY_GROUP_ID=$SECURITY_GROUP_ID" >> $GITHUB_ENV
           echo "EC2_INSTANCE_PUBLIC_IP=$EC2_INSTANCE_PUBLIC_IP" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> $GITHUB_ENV          
-          
+          echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> $GITHUB_ENV
+        
           # Imprimir los valores para verificar
           echo "Security Group ID: $SECURITY_GROUP_ID"
           echo "EC2 Public IP: $EC2_INSTANCE_PUBLIC_IP"
