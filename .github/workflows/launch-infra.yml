@@ -107,6 +107,7 @@ jobs:
           echo "EC2 Public IP: $EC2_INSTANCE_PUBLIC_IP"
           echo "EC2 Instance ID: $EC2_INSTANCE_ID"
 
+
       - name: Guardar Variables en el Repositorio
         working-directory: scripts-repo
 
