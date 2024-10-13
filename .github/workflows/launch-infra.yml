@@ -99,10 +99,9 @@ jobs:
       - name: Capture Terraform Outputs
         working-directory: terraform-repo
         run: |
-          # Capturar los outputs de Terraform y limpiar la salida
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | sed -n 's/^"\(.*\)"/\1/p')
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | sed -n 's/^"\(.*\)"/\1/p')
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | sed -n 's/^"\(.*\)"/\1/p')
+         SECURITY_GROUP_ID=$(terraform output -json security_group_id | jq -r .value)
+         EC2_INSTANCE_PUBLIC_IP=$(terraform output -json ec2_instance_public_ip | jq -r .value)
+         EC2_INSTANCE_ID=$(terraform output -json ec2_instance_id | jq -r .value)
       
           # Imprimir los valores
           echo "Security Group ID FIRST: $SECURITY_GROUP_ID"
@@ -114,11 +113,6 @@ jobs:
             echo "Error: no se pudieron capturar las variables de Terraform"
             exit 1
           fi
-      
-          # Limpieza de valores
-          SECURITY_GROUP_ID=$(echo "$SECURITY_GROUP_ID" | tr -d '[:space:]' | sed 's/\"//g')
-          EC2_INSTANCE_PUBLIC_IP=$(echo "$EC2_INSTANCE_PUBLIC_IP" | tr -d '[:space:]' | sed 's/\"//g')
-          EC2_INSTANCE_ID=$(echo "$EC2_INSTANCE_ID" | tr -d '[:space:]' | sed 's/\"//g')
       
           echo "Security Group ID SECOND: $SECURITY_GROUP_ID"
           echo "EC2 Public IP SECOND: $EC2_INSTANCE_PUBLIC_IP"
