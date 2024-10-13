@@ -89,10 +89,11 @@ jobs:
         run: |
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" -auto-approve
                     
-          # Capturar y filtrar los outputs de Terraform
-          SECURITY_GROUP_ID=$(terraform output -raw security_group_id)
-          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip)
-          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id)
+          # Capturar los outputs de Terraform y limpiar la salida
+          SECURITY_GROUP_ID=$(terraform output -raw security_group_id | awk -F'::' '{print $1}')
+          EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip | awk -F'::' '{print $1}')
+          EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id | awk -F'::' '{print $1}')
+
 
 
           echo "Security Group ID FIRST: $SECURITY_GROUP_ID"
