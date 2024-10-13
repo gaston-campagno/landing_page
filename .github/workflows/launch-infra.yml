@@ -68,6 +68,11 @@ jobs:
         with:
           terraform_version: 1.9.7
 
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
       # Paso 5: Inicializar Terraform
       - name: Initialize Terraform
         run: |
@@ -89,46 +94,21 @@ jobs:
         run: |
           terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" -auto-approve
       
-      # Paso 2: Mostrar Outputs de Terraform
-      - name: Show Terraform Outputs
-        working-directory: terraform-repo
-        run: |
-          terraform output
-      
-      # Paso 3: Capturar Outputs de Terraform
+      - name: Show Terraform Outputs in JSON Format
+        run: terraform output -json
+
       - name: Capture Terraform Outputs
-        working-directory: terraform-repo
         run: |
-         SECURITY_GROUP_ID=$(terraform output -json security_group_id | jq -r .value)
-         EC2_INSTANCE_PUBLIC_IP=$(terraform output -json ec2_instance_public_ip | jq -r .value)
-         EC2_INSTANCE_ID=$(terraform output -json ec2_instance_id | jq -r .value)
-      
-          # Imprimir los valores
-          echo "Security Group ID FIRST: $SECURITY_GROUP_ID"
-          echo "EC2 Public IP FIRST: $EC2_INSTANCE_PUBLIC_IP"
-          echo "EC2 Instance ID FIRST: $EC2_INSTANCE_ID"
-      
-          # Validación
-          if [ -z "$SECURITY_GROUP_ID" ] || [ -z "$EC2_INSTANCE_PUBLIC_IP" ] || [ -z "$EC2_INSTANCE_ID" ]; then
-            echo "Error: no se pudieron capturar las variables de Terraform"
-            exit 1
-          fi
-      
-          echo "Security Group ID SECOND: $SECURITY_GROUP_ID"
-          echo "EC2 Public IP SECOND: $EC2_INSTANCE_PUBLIC_IP"
-          echo "EC2 Instance ID SECOND: $EC2_INSTANCE_ID"
-      
-          # Guardar las variables en GITHUB_ENV
-          echo "SECURITY_GROUP_ID=$SECURITY_GROUP_ID" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_PUBLIC_IP=$EC2_INSTANCE_PUBLIC_IP" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_ID=$EC2_INSTANCE_ID" >> $GITHUB_ENV
-      
-          # Imprimir los valores
+          OUTPUT=$(terraform output -json 2>&1)
+          echo "$OUTPUT"
+
+          SECURITY_GROUP_ID=$(echo "$OUTPUT" | jq -r '.security_group_id.value')
+          EC2_INSTANCE_PUBLIC_IP=$(echo "$OUTPUT" | jq -r '.ec2_instance_public_ip.value')
+          EC2_INSTANCE_ID=$(echo "$OUTPUT" | jq -r '.ec2_instance_id.value')
+
           echo "Security Group ID: $SECURITY_GROUP_ID"
           echo "EC2 Public IP: $EC2_INSTANCE_PUBLIC_IP"
           echo "EC2 Instance ID: $EC2_INSTANCE_ID"
-
-      
 
       - name: Guardar Variables en el Repositorio
         working-directory: scripts-repo
