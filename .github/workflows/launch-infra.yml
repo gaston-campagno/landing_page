@@ -83,7 +83,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          terraform apply -var "github_token=${{ secrets.READ_TOKEN }}" \
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          terraform apply -var "instance_name=$REPO_NAME" \
+                          -var "github_token=${{ secrets.READ_TOKEN }}" \
                           -auto-approve
                                     
           # Capturar los outputs de Terraform usando grep para evitar mensajes adicionales
