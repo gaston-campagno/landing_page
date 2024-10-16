@@ -34,14 +34,12 @@ jobs:
 
       # 2. Copiar el script a la EC2 usando SCP
       - name: Copy certbot script to EC2
-        uses: appleboy/scp-action@v0.1.3
-        with:
-          host: ${{ vars.EC2_INSTANCE_PUBLIC_IP }}  # Elastic IP de la EC2
-          username: ubuntu  # Cambia si usas otro usuario en tu EC2
-          key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
-          source: ./scripts-repo/certbot_script.sh  # Ruta donde está el script en tu repositorio
-          target: /home/ubuntu/certbot_script.sh  # Ruta donde quieres copiarlo en la EC2
-
+        run: |
+          scp -i ${{ secrets.EC2_SSH_KEY }} \
+            -o StrictHostKeyChecking=no \
+            ./scripts-repo/certbot_script.sh \
+            ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }}:/home/ubuntu/certbot_script.sh
+      
       # 3. Conectarse vía SSH a la EC2 y ejecutar el script
       - name: SSH into EC2 and generate SSL certificates
         uses: appleboy/ssh-action@v0.1.8
