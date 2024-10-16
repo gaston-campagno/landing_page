@@ -56,7 +56,7 @@ jobs:
             # Asegurarse de que el script es ejecutable
             chmod +x /home/ubuntu/scripts-repo/certbot_script.sh
             # Ejecutar el script de Certbot
-            .scripts-repo/certbot_script.sh block-server.com www.block-server.com
+            ./home/ubuntu/scripts-repo/certbot_script.sh block-server.com www.block-server.com
 
             # Verificar que los certificados están en las rutas correctas
             ls /etc/letsencrypt/live/block-server.com/
