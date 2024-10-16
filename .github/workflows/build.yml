@@ -32,13 +32,18 @@ jobs:
           cd scripts-repo
           ls -a
 
-      # 2. Copiar el script a la EC2 usando SCP
+      - name: Create SSH key file
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+      
       - name: Copy certbot script to EC2
         run: |
-          scp -i ${{ secrets.EC2_SSH_KEY }} \
+          scp -i /tmp/ssh_key \
             -o StrictHostKeyChecking=no \
             ./scripts-repo/certbot_script.sh \
             ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }}:/home/ubuntu/certbot_script.sh
+
       
       # 3. Conectarse vía SSH a la EC2 y ejecutar el script
       - name: SSH into EC2 and generate SSL certificates
