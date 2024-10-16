@@ -71,7 +71,7 @@ jobs:
       # Construir la imagen Docker
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} ./react-repo/landing-page/Dockerfile
+          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} ./react-repo/landing-page/
 
       # Subir la imagen a ECR
       - name: Push Docker image to Amazon ECR
