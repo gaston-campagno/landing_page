@@ -8,7 +8,7 @@ on:
   
 env:
   AWS_REGION: 'us-east-2'  # Cambia según tu región
-  REPO_NAME: ${{ github.repository }}  # El nombre del repo será el nombre de tu repo de GitHub
+  REPO_NAME: ${GITHUB_REPOSITORY##*/}  # El nombre del repo será el nombre de tu repo de GitHub
   IMAGE_TAG: ${{ github.sha }}  # El tag de la imagen será el SHA del commit
 
 jobs:
@@ -19,47 +19,6 @@ jobs:
       - name: Checkout the app repository
         uses: actions/checkout@v3
 
-      - name: Checkout User Data Scripts Repo
-        uses: actions/checkout@v3
-        with:
-          repository: gaston-campagno/scripts
-          token: ${{ secrets.READ_TOKEN }}
-          path: scripts-repo
-
-      - name: List scripts
-        run: |
-          ls -a 
-          cd scripts-repo
-          ls -a
-
-      - name: Create SSH key file
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > /tmp/ssh_key
-          chmod 600 /tmp/ssh_key
-      
-      - name: Copy certbot script to EC2
-        run: |
-          scp -i /tmp/ssh_key \
-            -o StrictHostKeyChecking=no \
-            -r ./scripts-repo/ \
-            ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }}:/home/ubuntu/scripts-repo/
-
-      
-      # 3. Conectarse vía SSH a la EC2 y ejecutar el script
-      - name: SSH into EC2 and generate SSL certificates
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ vars.EC2_INSTANCE_PUBLIC_IP }}  # Elastic IP de la EC2
-          username: ubuntu  # Cambia si usas otro usuario en tu EC2
-          key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
-          script: |
-            # Asegurarse de que el script es ejecutable
-            chmod +x /home/ubuntu/scripts-repo/certbot_script.sh
-            # Ejecutar el script de Certbot
-            ./home/ubuntu/scripts-repo/certbot_script.sh block-server.com www.block-server.com
-
-            # Verificar que los certificados están en las rutas correctas
-            ls /etc/letsencrypt/live/block-server.com/
 
       # Crear el repositorio ECR si no existe
       - name: Check if ECR repository exists
