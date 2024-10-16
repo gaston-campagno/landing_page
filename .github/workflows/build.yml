@@ -26,7 +26,17 @@ jobs:
           token: ${{ secrets.READ_TOKEN }}
           path: scripts-repo
 
-      # Nos conectamos por SSH a la EC2 y generamos los certificados
+      # 2. Copiar el script a la EC2 usando SCP
+      - name: Copy certbot script to EC2
+        uses: appleboy/scp-action@v0.1.3
+        with:
+          host: ${{ vars.EC2_INSTANCE_PUBLIC_IP }}  # Elastic IP de la EC2
+          username: ubuntu  # Cambia si usas otro usuario en tu EC2
+          key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
+          source: ./scripts-repo/certbot_script.sh  # Ruta donde está el script en tu repositorio
+          target: /home/ubuntu/certbot_script.sh  # Ruta donde quieres copiarlo en la EC2
+
+      # 3. Conectarse vía SSH a la EC2 y ejecutar el script
       - name: SSH into EC2 and generate SSL certificates
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -34,11 +44,12 @@ jobs:
           username: ubuntu  # Cambia si usas otro usuario en tu EC2
           key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
           script: |
-            # Ejecutamos el script de Certbot para generar los certificados
-            chmod +x ./scripts/certbot_script.sh
-            ./scripts/certbot_script.sh block-server.com www.block-server.com
+            # Asegurarse de que el script es ejecutable
+            chmod +x /home/ubuntu/certbot_script.sh
+            # Ejecutar el script de Certbot
+            ./certbot_script.sh block-server.com www.block-server.com
 
-            # Asegurarse de que los certificados están en las rutas correctas
+            # Verificar que los certificados están en las rutas correctas
             ls /etc/letsencrypt/live/block-server.com/
 
       # Crear el repositorio ECR si no existe
