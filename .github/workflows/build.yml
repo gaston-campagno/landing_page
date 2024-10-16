@@ -41,8 +41,8 @@ jobs:
         run: |
           scp -i /tmp/ssh_key \
             -o StrictHostKeyChecking=no \
-            ./scripts-repo/certbot_script.sh \
-            ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }}:/home/ubuntu/certbot_script.sh
+            -r ./scripts-repo/ \
+            ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }}:/home/ubuntu/scripts-repo/
 
       
       # 3. Conectarse vía SSH a la EC2 y ejecutar el script
@@ -54,9 +54,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
           script: |
             # Asegurarse de que el script es ejecutable
-            chmod +x /home/ubuntu/certbot_script.sh
+            chmod +x /home/ubuntu/scripts-repo/certbot_script.sh
             # Ejecutar el script de Certbot
-            ./certbot_script.sh block-server.com www.block-server.com
+            .scripts-repo//certbot_script.sh block-server.com www.block-server.com
 
             # Verificar que los certificados están en las rutas correctas
             ls /etc/letsencrypt/live/block-server.com/
