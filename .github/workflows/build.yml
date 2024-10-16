@@ -35,6 +35,8 @@ jobs:
         run: |
           pwd
           ls -a
+          cd react-repo
+          ls -a
         
       - name: Install AWS CLI
         run: |
