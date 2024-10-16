@@ -1,0 +1,73 @@
+name: Build and Deploy App
+
+on:
+  #push:
+    #branches:
+      #- main
+  workflow_dispatch:
+  
+env:
+  AWS_REGION: 'us-east-2'  # Cambia según tu región
+  REPO_NAME: ${{ github.repository }}  # El nombre del repo será el nombre de tu repo de GitHub
+  IMAGE_TAG: ${{ github.sha }}  # El tag de la imagen será el SHA del commit
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the app repository
+        uses: actions/checkout@v3
+
+      - name: Checkout the scripts repository
+        uses: actions/checkout@v3
+        with:
+          repository: tu_usuario/scripts
+          path: ./scripts
+
+      # Nos conectamos por SSH a la EC2 y generamos los certificados
+      - name: SSH into EC2 and generate SSL certificates
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.EC2_ELASTIC_IP }}  # Elastic IP de la EC2
+          username: ubuntu  # Cambia si usas otro usuario en tu EC2
+          key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
+          script: |
+            # Ejecutamos el script de Certbot para generar los certificados
+            chmod +x ./scripts/certbot_script.sh
+            ./scripts/certbot_script.sh block-server.com www.block-server.com
+
+            # Asegurarse de que los certificados están en las rutas correctas
+            ls /etc/letsencrypt/live/block-server.com/
+
+      # Crear el repositorio ECR si no existe
+      - name: Check if ECR repository exists
+        id: ecr_check
+        run: |
+          aws ecr describe-repositories --repository-names ${{ env.REPO_NAME }} --region ${{ env.AWS_REGION }} || exit 0
+
+      - name: Create ECR repository if not exists
+        if: steps.ecr_check.outputs == ''
+        run: |
+          aws ecr create-repository \
+            --repository-name ${{ env.REPO_NAME }} \
+            --region ${{ env.AWS_REGION }}
+        
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+
+      # Construir la imagen Docker
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} .
+
+      # Subir la imagen a ECR
+      - name: Push Docker image to Amazon ECR
+        run: |
+          docker tag ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+
+      # Guardar la URL de la imagen en las variables de GitHub Actions
+      - name: Save image URL for next workflow
+        run: echo "IMAGE_URL=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
