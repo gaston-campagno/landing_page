@@ -25,9 +25,17 @@ jobs:
           echo "REPO_NAME: $REPO_NAME"
           echo "IMAGE_TAG: $IMAGE_TAG"
 
-      - name: Checkout the app repository
+      # Paso 1: Checkout del repositorio de React (la app)
+      - name: Checkout React Repo
         uses: actions/checkout@v3
+        with:
+          path: react-repo
 
+      - name: PWD react-repo
+        run: |
+          pwd
+          ls -a
+        
       - name: Install AWS CLI
         run: |
           sudo apt-get update
@@ -59,7 +67,7 @@ jobs:
       # Construir la imagen Docker
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} ./landing-page/Dockerfile
+          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} react-repo/landing-page/Dockerfile
 
       # Subir la imagen a ECR
       - name: Push Docker image to Amazon ECR
