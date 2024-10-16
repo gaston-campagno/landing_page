@@ -5,17 +5,26 @@ on:
     #branches:
       #- main
   workflow_dispatch:
-  
-env:
-  AWS_REGION: 'us-east-2'  # Cambia según tu región
-  REPO_NAME: ${GITHUB_REPOSITORY##*/}  # El nombre del repo será el nombre de tu repo de GitHub
-  IMAGE_TAG: ${{ github.sha }}  # El tag de la imagen será el SHA del commit
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Set up environment variables
+        run: |
+          echo "AWS_REGION=us-east-2" >> $GITHUB_ENV
+          REPO_NAME=${GITHUB_REPOSITORY##*/}  # Extrae solo el nombre del repo
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+  
+      - name: Print environment variables
+        run: |
+          echo "AWS_REGION: $AWS_REGION"
+          echo "REPO_NAME: $REPO_NAME"
+          echo "IMAGE_TAG: $IMAGE_TAG"
+
       - name: Checkout the app repository
         uses: actions/checkout@v3
 
@@ -50,7 +59,7 @@ jobs:
       # Construir la imagen Docker
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} .
+          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} ./landing-page/Dockerfile
 
       # Subir la imagen a ECR
       - name: Push Docker image to Amazon ECR
