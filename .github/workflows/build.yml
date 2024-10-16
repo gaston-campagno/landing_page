@@ -28,8 +28,6 @@ jobs:
 
       - name: List scripts
         run: |
-          ls -l ./scripts-repo/certbot_script.sh
-          cd /scripts-repo
           ls -a 
 
       # 2. Copiar el script a la EC2 usando SCP
