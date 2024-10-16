@@ -22,7 +22,8 @@ jobs:
         run: |
           pwd
           ls -a
-
+          cd react-repo
+          ls -a
         # Paso 3: Checkout del repositorio de Scripts de user_data
       - name: Checkout User Data Scripts Repo
         uses: actions/checkout@v3
