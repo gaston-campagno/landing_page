@@ -55,14 +55,21 @@ jobs:
       - name: Check if ECR repository exists
         id: ecr_check
         run: |
-          aws ecr describe-repositories --repository-names ${{ env.REPO_NAME }} --region ${{ env.AWS_REGION }} || exit 0
-
+          if aws ecr describe-repositories --repository-names ${{ env.REPO_NAME }} --region ${{ env.AWS_REGION }}; then
+            echo "Repository exists."
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "Repository does not exist."
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+      
       - name: Create ECR repository if not exists
-        if: steps.ecr_check.outputs == ''
+        if: env.exists == 'false'
         run: |
           aws ecr create-repository \
             --repository-name ${{ env.REPO_NAME }} \
             --region ${{ env.AWS_REGION }}
+
         
       - name: Log in to Amazon ECR
         run: |
