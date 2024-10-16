@@ -25,5 +25,5 @@ jobs:
           ls -a
           echo  "${{ secrets.READ_TOKEN }}"
           echo ${{ github.repository }}
-          echo ${{ env.EC2_INSTANCE_PUBLIC_IP }}
+          echo ${{ vars.EC2_INSTANCE_PUBLIC_IP }}
           gh --version
