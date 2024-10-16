@@ -22,7 +22,7 @@ jobs:
       - name: Checkout the scripts repository
         uses: actions/checkout@v3
         with:
-          repository: tu_usuario/scripts
+          repository: gaston-campagno/scripts
           path: ./scripts
 
       # Nos conectamos por SSH a la EC2 y generamos los certificados
