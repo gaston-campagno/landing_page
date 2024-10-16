@@ -37,7 +37,9 @@ jobs:
           ls -a
           cd react-repo
           ls -a
-        
+          cd landing-page
+          ls -a
+          pwd
       - name: Install AWS CLI
         run: |
           sudo apt-get update
@@ -69,7 +71,7 @@ jobs:
       # Construir la imagen Docker
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} react-repo/landing-page/Dockerfile
+          docker build -t ${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }} ./react-repo/landing-page/Dockerfile
 
       # Subir la imagen a ECR
       - name: Push Docker image to Amazon ECR
