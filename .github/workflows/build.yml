@@ -30,7 +30,7 @@ jobs:
       - name: SSH into EC2 and generate SSL certificates
         uses: appleboy/ssh-action@v0.1.8
         with:
-          host: ${{ secrets.EC2_ELASTIC_IP }}  # Elastic IP de la EC2
+          host: ${{ env.EC2_INSTANCE_PUBLIC_IP }}  # Elastic IP de la EC2
           username: ubuntu  # Cambia si usas otro usuario en tu EC2
           key: ${{ secrets.EC2_SSH_KEY }}  # Llave privada SSH
           script: |
