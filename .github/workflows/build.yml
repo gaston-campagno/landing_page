@@ -19,11 +19,12 @@ jobs:
       - name: Checkout the app repository
         uses: actions/checkout@v3
 
-      - name: Checkout the scripts repository
+      - name: Checkout User Data Scripts Repo
         uses: actions/checkout@v3
         with:
           repository: gaston-campagno/scripts
-          path: ./scripts
+          token: ${{ secrets.READ_TOKEN }}
+          path: scripts-repo
 
       # Nos conectamos por SSH a la EC2 y generamos los certificados
       - name: SSH into EC2 and generate SSL certificates
