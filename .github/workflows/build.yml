@@ -40,6 +40,15 @@ jobs:
           cd landing-page
           ls -a
           pwd
+          
+        # Paso 3: Checkout del repositorio de Scripts de user_data
+      - name: Checkout User Data Scripts Repo
+        uses: actions/checkout@v3
+        with:
+          repository: gaston-campagno/scripts
+          token: ${{ secrets.READ_TOKEN }}
+          path: scripts-repo
+          
       - name: Install AWS CLI
         run: |
           sudo apt-get update
@@ -89,3 +98,19 @@ jobs:
       # Guardar la URL de la imagen en las variables de GitHub Actions
       - name: Save image URL for next workflow
         run: echo "IMAGE_URL=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_ENV
+
+      - name: Guardar Variables en el Repositorio
+        working-directory: scripts-repo
+
+        run: |
+          echo "github.repository: $GITHUB_REPOSITORY"
+          echo "SECURITY_GROUP_ID: $SECURITY_GROUP_ID"
+          echo "EC2_INSTANCE_PUBLIC_IP: $EC2_INSTANCE_PUBLIC_IP"
+          echo "EC2_INSTANCE_ID: $EC2_INSTANCE_ID"
+          echo "GITHUB_TOKEN: ${{ secrets.READ_TOKEN }}"
+
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.REPO_NAME }}:${{ env.IMAGE_TAG }}
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          
+          chmod +x recordVar.sh
+          ./recordVar.sh "$GITHUB_REPOSITORY" "IMAGE_URI" "$IMAGE_URI" "${{ secrets.READ_TOKEN }}"
