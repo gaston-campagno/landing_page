@@ -17,7 +17,7 @@ jobs:
       - name: Set up environment variables
         run: |
           CONTAINER_NAME=${GITHUB_REPOSITORY##*/}
-          echo "CONTAINER_NAME:$CONTAINER_NAME" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=$CONTAINER_NAME" >> $GITHUB_ENV
     
       # Conectar a la instancia EC2
       - name: SSH into EC2 instance and deploy
