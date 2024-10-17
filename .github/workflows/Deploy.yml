@@ -1,0 +1,55 @@
+# Deploy Workflow
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      - name: Set up environment variables
+        run: |
+          CONTAINER_NAME: ${GITHUB_REPOSITORY##*/}
+          echo "CONTAINER_NAME:$CONTAINER_NAME" >> $GITHUB_ENV
+    
+      # Conectar a la instancia EC2
+      - name: SSH into EC2 instance and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo apt update
+            # Verificar si Snap está instalado
+            if ! command -v snap &> /dev/null
+            then
+                echo "Snap no está instalado. Instalando Snap..."
+                sudo apt install snapd -y
+            else
+                echo "Snap ya está instalado."
+            fi            
+            # Instalar AWS CLI con Snap
+            sudo snap install aws-cli --classic
+            # Verificar la versión de AWS CLI
+            aws --version
+            # AWS configure
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set default.region ${{ env.AWS_REGION }}
+            
+            #LOGIN
+            aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
+             
+            # Detener contenedor en ejecución (si existe)
+            docker stop ${{ env.CONTAINER_NAME }} || true
+            docker rm ${{ env.CONTAINER_NAME }} || true
+
+            docker run -d --name ${{ env.CONTAINER_NAME }} -p 80:80 ${{ vars.IMAGE_URI }}
